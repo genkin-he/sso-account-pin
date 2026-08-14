@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>SSO 账号锁定 — 设置</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>SSO 账号锁定</h1>
+        <p class="lede">
+          企业 SSO 登录时，自动把授权请求指向指定的 Google 账号，跳过「选账号 / 输邮箱」那一步。
+        </p>
+      </header>
+
+      <form id="settings-form">
+        <section>
+          <label for="email">企业 Google 账号</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="you@your-company.com"
+            autocomplete="off"
+            required
+          />
+          <p class="hint">登录时要锁定到的账号。会作为 <code>login_hint</code> 挂到授权请求上。</p>
+        </section>
+
+        <section>
+          <label for="domains">企业域名</label>
+          <textarea
+            id="domains"
+            rows="6"
+            placeholder="your-company.com&#10;your-company.cn&#10;your-product.com"
+          ></textarea>
+          <p class="hint">
+            一行一个，也可以用逗号或空格分隔。用来识别「这是公司的登录流程」——
+            <strong>只有 URL 里出现这些域名的请求才会被改写</strong>，
+            你用个人账号登录其他网站不受影响。
+          </p>
+        </section>
+
+        <section class="row">
+          <label class="checkbox">
+            <input id="use-authuser" type="checkbox" />
+            <span>额外挂上会话索引 <code>authuser</code></span>
+          </label>
+          <input id="authuser" type="text" inputmode="numeric" placeholder="1" size="4" />
+          <p class="hint">
+            仅在只挂 <code>login_hint</code> 选不中账号时才需要。取值是 Gmail 地址栏
+            <code>/mail/u/<em>N</em>/</code> 里的那个 N。注意它会随登录顺序变化。
+          </p>
+        </section>
+
+        <footer>
+          <button type="submit">保存并授权</button>
+          <span id="status" role="status"></span>
+        </footer>
+      </form>
+
+      <section id="backup">
+        <h2>备份配置</h2>
+        <p class="hint">
+          导出成 JSON 文件存起来，重装扩展或换机器后导入即可，不用重填。
+          文件里含你的企业邮箱和域名列表，别随手外发。
+        </p>
+        <p class="actions">
+          <button type="button" class="secondary" id="export-config">导出配置</button>
+          <button type="button" class="secondary" id="import-config">导入配置</button>
+          <input id="import-file" type="file" accept="application/json,.json" hidden />
+          <span id="backup-status" role="status"></span>
+        </p>
+      </section>
+
+      <section id="active-rules" hidden>
+        <h2>当前生效的规则</h2>
+        <pre id="rules-dump"></pre>
+      </section>
+
+      <section id="diagnostics">
+        <h2>诊断</h2>
+        <p class="hint">
+          登录后规则似乎没起作用时，用这个查看最近 5 分钟内的命中记录。
+          需要额外授权一项权限——它只用于读取本扩展自己的规则命中记录，
+          不会上传任何数据，随时可以在扩展详情页撤销。
+        </p>
+        <p>
+          <button type="button" id="check-matches">查看最近命中的规则</button>
+          <span id="diag-status" role="status"></span>
+        </p>
+        <pre id="matched-dump" hidden></pre>
+      </section>
+    </main>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
