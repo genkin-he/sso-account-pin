@@ -1,4 +1,4 @@
-import { getSettings, isComplete } from "./settings.js";
+import { getSettings, isComplete, hasAnyConfig } from "./settings.js";
 
 const PREFIX = "[SSO Account Pin]";
 
@@ -33,27 +33,36 @@ const IDP_PATHS = [
   "/realms/*/broker/*/login",
 ];
 
-function buildRules(settings) {
+// SSO 规则优先级高于账号绑定。同一个域名两边都填了的时候，Chrome 按优先级
+// 决胜负——不定优先级的话哪条生效是未定义的，排查起来会很痛苦。
+const PRIORITY_SSO = 2;
+const PRIORITY_ACCOUNT = 1;
+
+function toAction(addOrReplaceParams) {
+  return {
+    type: "redirect",
+    redirect: { transform: { queryTransform: { addOrReplaceParams } } },
+  };
+}
+
+function buildSsoRules(settings, startId) {
   const addOrReplaceParams = [{ key: "login_hint", value: settings.email }];
   if (settings.useAuthuser && settings.authuser !== "") {
     addOrReplaceParams.push({ key: "authuser", value: String(settings.authuser) });
   }
 
-  const action = {
-    type: "redirect",
-    redirect: { transform: { queryTransform: { addOrReplaceParams } } },
-  };
+  const action = toAction(addOrReplaceParams);
 
   // 每个域名单独出规则，不把所有域名拼成一个大正则——
   // 拼起来会超出 2KB 编译上限，整条规则被 Chrome 静默跳过。
   const rules = [];
-  let id = 1;
+  let id = startId;
 
   for (const domain of settings.domains) {
     // Google 的 OAuth 授权端点——身份提供方 302 过去的那一跳，真正的注入点
     rules.push({
       id: id++,
-      priority: 1,
+      priority: PRIORITY_SSO,
       action,
       condition: {
         regexFilter:
@@ -68,7 +77,7 @@ function buildRules(settings) {
     for (const path of IDP_PATHS) {
       rules.push({
         id: id++,
-        priority: 1,
+        priority: PRIORITY_SSO,
         action,
         condition: { urlFilter: `||${domain}${path}`, resourceTypes: ["main_frame"] },
       });
@@ -78,14 +87,43 @@ function buildRules(settings) {
   return rules;
 }
 
+// 账号绑定：给指定域名的顶层导航挂上 authuser=<email>。
+// authuser 同时接受会话序号和邮箱地址，用邮箱更稳——序号会随登录顺序变。
+function buildAccountRules(settings, startId) {
+  const rules = [];
+  let id = startId;
+
+  for (const group of settings.accountRules) {
+    const action = toAction([{ key: "authuser", value: group.email }]);
+    for (const domain of group.domains) {
+      rules.push({
+        id: id++,
+        priority: PRIORITY_ACCOUNT,
+        action,
+        // || 按域名边界匹配并自动覆盖子域，末尾的 / 把匹配限定在路径起点，
+        // 免得 meet.google.com.evil.io 之类的域名也被算进来
+        condition: { urlFilter: `||${domain}/`, resourceTypes: ["main_frame"] },
+      });
+    }
+  }
+
+  return rules;
+}
+
+function buildRules(settings) {
+  // 两块功能各自独立：只配了其中一块时，另一块不产出规则
+  const ssoRules = isComplete(settings) ? buildSsoRules(settings, 1) : [];
+  return [...ssoRules, ...buildAccountRules(settings, ssoRules.length + 1)];
+}
+
 async function rebuildRules() {
   const settings = await getSettings();
   const existing = await chrome.declarativeNetRequest.getDynamicRules();
   const removeRuleIds = existing.map((rule) => rule.id);
 
-  if (!isComplete(settings)) {
+  if (!hasAnyConfig(settings)) {
     await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds });
-    console.log(`${PREFIX} 配置不完整（缺邮箱或域名），已清空规则`);
+    console.log(`${PREFIX} nothing configured, rules cleared`);
     return;
   }
 
@@ -97,7 +135,7 @@ async function rebuildRules() {
     });
   } catch (err) {
     // 域名含特殊字符导致正则非法之类，要让用户在设置页看得到
-    console.error(`${PREFIX} 规则写入失败：`, err);
+    console.error(`${PREFIX} failed to write rules:`, err);
     return;
   }
 
@@ -108,13 +146,13 @@ async function rebuildRules() {
     const written = new Set(actual.map((rule) => rule.id));
     const skipped = wanted.filter((rule) => !written.has(rule.id));
     console.error(
-      `${PREFIX} 有 ${skipped.length}/${wanted.length} 条规则被跳过：`,
+      `${PREFIX} skipped ${skipped.length}/${wanted.length} rules:`,
       skipped
     );
     return;
   }
 
-  console.log(`${PREFIX} ${actual.length} 条规则已生效 → ${settings.email}`);
+  console.log(`${PREFIX} ${actual.length} rules active → ${settings.email}`);
 }
 
 chrome.runtime.onInstalled.addListener(rebuildRules);
@@ -130,7 +168,7 @@ chrome.action.onClicked.addListener(() => chrome.runtime.openOptionsPage());
 // 商店安装的版本不会触发——那种情况下用设置页里的「最近命中」查看。
 if (chrome.declarativeNetRequest.onRuleMatchedDebug) {
   chrome.declarativeNetRequest.onRuleMatchedDebug.addListener((info) => {
-    console.log(`${PREFIX} 规则 ${info.rule.ruleId} 命中 →`, info.request.url);
+    console.log(`${PREFIX} rule ${info.rule.ruleId} matched →`, info.request.url);
   });
 }
 

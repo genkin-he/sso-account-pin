@@ -1,11 +1,18 @@
 # Privacy Policy — SSO Account Pin
 
-_Last updated: 2026-08-13_
+_Last updated: 2026-08-14_
 
 ## Summary
 
-SSO Account Pin does not collect, transmit, or sell any data. Everything you enter
-stays in your own browser.
+SSO Account Pin has no servers, no analytics, and no third-party services. The
+developer receives nothing from it, and no data is ever sold or shared.
+
+The settings you enter stay in your browser. The one exception is Chrome's own sync:
+because those settings are saved with `chrome.storage.sync`, Chrome will replicate
+them across your signed-in Chrome instances if you have Chrome Sync turned on. That
+replication is performed by Chrome, not by this extension. It is disclosed here, and
+in the extension's Chrome Web Store data declaration, because the data does leave
+your device in that case.
 
 ## What the extension stores
 
@@ -14,11 +21,6 @@ stays in your own browser.
 | The email address you configure | Added as the `login_hint` parameter on your organization's sign-in request so the correct account is selected | `chrome.storage.sync` |
 | The domain list you configure | Used to recognize which sign-in requests belong to your organization | `chrome.storage.sync` |
 | Optional account index (`authuser`) | Alternative way to select the account when `login_hint` is not enough | `chrome.storage.sync` |
-
-`chrome.storage.sync` is provided by Chrome. If you have Chrome Sync enabled, Chrome
-replicates this data across your own signed-in Chrome instances. That transfer is
-handled entirely by Google as part of Chrome Sync — the extension itself never sends
-data anywhere.
 
 The options page can export these settings to a JSON file on your own computer, and
 read such a file back. This happens only when you click the export or import button.

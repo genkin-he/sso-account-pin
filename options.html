@@ -1,97 +1,141 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<!-- 文案全部来自 _locales，由 options.js 在加载时填入；这里只留结构。
+     lang 也会被改成实际界面语言。 -->
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>SSO 账号锁定 — 设置</title>
+    <title>SSO Account Pin</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <main>
       <header>
-        <h1>SSO 账号锁定</h1>
-        <p class="lede">
-          企业 SSO 登录时，自动把授权请求指向指定的 Google 账号，跳过「选账号 / 输邮箱」那一步。
-        </p>
+        <!-- 图钉：对应扩展名里的 "Pin"。内联 SVG，不引外部资源 -->
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 17v5" />
+            <path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z" />
+          </svg>
+        </span>
+        <div>
+          <h1 data-i18n="appTitle"></h1>
+          <p class="lede" data-i18n="lede"></p>
+        </div>
       </header>
 
-      <form id="settings-form">
-        <section>
-          <label for="email">企业 Google 账号</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="you@your-company.com"
-            autocomplete="off"
-            required
-          />
-          <p class="hint">登录时要锁定到的账号。会作为 <code>login_hint</code> 挂到授权请求上。</p>
-        </section>
+      <nav class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="sso"
+                aria-controls="panel-sso" aria-selected="true" data-i18n="tabSso"></button>
+        <button type="button" role="tab" data-tab="accounts"
+                aria-controls="panel-accounts" aria-selected="false" data-i18n="tabAccounts"></button>
+        <button type="button" role="tab" data-tab="backup"
+                aria-controls="panel-backup" aria-selected="false" data-i18n="tabBackup"></button>
+        <button type="button" role="tab" data-tab="diag"
+                aria-controls="panel-diag" aria-selected="false" data-i18n="tabDiag"></button>
+      </nav>
 
-        <section>
-          <label for="domains">企业域名</label>
-          <textarea
-            id="domains"
-            rows="6"
-            placeholder="your-company.com&#10;your-company.cn&#10;your-product.com"
-          ></textarea>
-          <p class="hint">
-            一行一个，也可以用逗号或空格分隔。用来识别「这是公司的登录流程」——
-            <strong>只有 URL 里出现这些域名的请求才会被改写</strong>，
-            你用个人账号登录其他网站不受影响。
-          </p>
-        </section>
+      <section class="card">
+        <!-- 两个配置面板共用一个 form：保存时要一次性申请所有域名的 host 权限，
+             拆成两个表单就得让用户授权两次。备份和诊断没有可保存的东西，放在
+             form 外面，保存栏也随之隐藏。 -->
+        <form id="settings-form">
+          <div class="panel" id="panel-sso" role="tabpanel">
+            <section>
+              <label for="email" data-i18n="emailLabel"></label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@your-company.com"
+                autocomplete="off"
+              />
+              <p class="hint" data-i18n="emailHint"></p>
+            </section>
 
-        <section class="row">
-          <label class="checkbox">
-            <input id="use-authuser" type="checkbox" />
-            <span>额外挂上会话索引 <code>authuser</code></span>
-          </label>
-          <input id="authuser" type="text" inputmode="numeric" placeholder="1" size="4" />
-          <p class="hint">
-            仅在只挂 <code>login_hint</code> 选不中账号时才需要。取值是 Gmail 地址栏
-            <code>/mail/u/<em>N</em>/</code> 里的那个 N。注意它会随登录顺序变化。
-          </p>
-        </section>
+            <section>
+              <label for="domains" data-i18n="domainsLabel"></label>
+              <textarea
+                id="domains"
+                rows="6"
+                placeholder="your-company.com&#10;your-company.cn&#10;your-product.com"
+              ></textarea>
+              <p class="hint" data-i18n="domainsHint"></p>
+            </section>
 
-        <footer>
-          <button type="submit">保存并授权</button>
-          <span id="status" role="status"></span>
-        </footer>
-      </form>
+            <section class="row">
+              <label class="checkbox">
+                <input id="use-authuser" type="checkbox" />
+                <span data-i18n="authuserCheckbox"></span>
+              </label>
+              <input id="authuser" type="text" inputmode="numeric" placeholder="1" size="4" />
+              <p class="hint" data-i18n="authuserHint"></p>
+            </section>
+          </div>
 
-      <section id="backup">
-        <h2>备份配置</h2>
-        <p class="hint">
-          导出成 JSON 文件存起来，重装扩展或换机器后导入即可，不用重填。
-          文件里含你的企业邮箱和域名列表，别随手外发。
-        </p>
-        <p class="actions">
-          <button type="button" class="secondary" id="export-config">导出配置</button>
-          <button type="button" class="secondary" id="import-config">导入配置</button>
-          <input id="import-file" type="file" accept="application/json,.json" hidden />
-          <span id="backup-status" role="status"></span>
-        </p>
-      </section>
+          <div class="panel" id="panel-accounts" role="tabpanel" hidden>
+            <section>
+              <p class="hint" data-i18n="accountsIntro"></p>
+              <div id="account-groups"></div>
+              <p class="hint empty-note" id="accounts-empty" data-i18n="accountsEmpty"></p>
+              <p class="actions">
+                <button type="button" class="ghost" id="add-group" data-i18n="addGroupButton"></button>
+              </p>
+            </section>
+          </div>
 
-      <section id="active-rules" hidden>
-        <h2>当前生效的规则</h2>
-        <pre id="rules-dump"></pre>
-      </section>
+          <footer id="save-bar">
+            <button type="submit" data-i18n="saveButton"></button>
+            <span id="status" role="status"></span>
+          </footer>
+        </form>
 
-      <section id="diagnostics">
-        <h2>诊断</h2>
-        <p class="hint">
-          登录后规则似乎没起作用时，用这个查看最近 5 分钟内的命中记录。
-          需要额外授权一项权限——它只用于读取本扩展自己的规则命中记录，
-          不会上传任何数据，随时可以在扩展详情页撤销。
-        </p>
-        <p>
-          <button type="button" id="check-matches">查看最近命中的规则</button>
-          <span id="diag-status" role="status"></span>
-        </p>
-        <pre id="matched-dump" hidden></pre>
+        <div class="panel" id="panel-backup" role="tabpanel" hidden>
+          <section>
+            <p class="hint" data-i18n="backupHint"></p>
+            <p class="actions">
+              <button type="button" class="ghost" id="export-config" data-i18n="exportButton"></button>
+              <button type="button" class="ghost" id="import-config" data-i18n="importButton"></button>
+              <input id="import-file" type="file" accept="application/json,.json" hidden />
+              <span id="backup-status" role="status"></span>
+            </p>
+          </section>
+        </div>
+
+        <div class="panel" id="panel-diag" role="tabpanel" hidden>
+          <section>
+            <p class="hint" data-i18n="diagnosticsHint"></p>
+            <p class="actions">
+              <button type="button" class="ghost" id="check-matches" data-i18n="checkMatchesButton"></button>
+              <span id="diag-status" role="status"></span>
+            </p>
+            <pre id="matched-dump" hidden></pre>
+          </section>
+
+          <section id="active-rules" hidden>
+            <h2 data-i18n="activeRulesTitle"></h2>
+            <pre id="rules-dump"></pre>
+          </section>
+        </div>
       </section>
     </main>
+
+    <!-- 一组账号绑定。label 包着 input，省掉动态生成 id 的麻烦。 -->
+    <template id="account-group-template">
+      <section class="group">
+        <div class="group-head">
+          <span class="group-index"></span>
+          <button type="button" class="ghost remove-group" data-i18n="removeGroupButton"></button>
+        </div>
+        <label class="field">
+          <span data-i18n="groupEmailLabel"></span>
+          <input type="email" class="group-email" placeholder="you@your-company.com" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span data-i18n="groupDomainsLabel"></span>
+          <textarea class="group-domains" rows="3" placeholder="meet.google.com&#10;calendar.google.com"></textarea>
+        </label>
+      </section>
+    </template>
 
     <script type="module" src="options.js"></script>
   </body>

@@ -1,0 +1,212 @@
+{
+  "extName": {
+    "message": "SSO 账号锁定",
+    "description": "Extension name shown in the toolbar and chrome://extensions"
+  },
+  "extDescription": {
+    "message": "企业 SSO 登录时自动锁定到指定的 Google 账号，浏览器里登录了多个账号也不再弹出选账号页面。",
+    "description": "Extension description shown in chrome://extensions"
+  },
+  "actionTitle": {
+    "message": "SSO 账号锁定 — 设置",
+    "description": "Tooltip on the toolbar icon"
+  },
+  "optionsTitle": {
+    "message": "SSO 账号锁定 — 设置",
+    "description": "Title of the options page"
+  },
+  "appTitle": {
+    "message": "SSO 账号锁定",
+    "description": "Main heading of the options page"
+  },
+  "lede": {
+    "message": "企业 SSO 登录时，自动把授权请求指向指定的 Google 账号，跳过「选账号 / 输邮箱」那一步。"
+  },
+  "emailLabel": {
+    "message": "企业 Google 账号"
+  },
+  "emailHint": {
+    "message": "登录时要锁定到的账号。会作为 `login_hint` 挂到授权请求上。"
+  },
+  "domainsLabel": {
+    "message": "企业域名"
+  },
+  "domainsHint": {
+    "message": "一行一个，也可以用逗号或空格分隔。用来识别「这是公司的登录流程」——*只有 URL 里出现这些域名的请求才会被改写*，你用个人账号登录其他网站不受影响。"
+  },
+  "authuserCheckbox": {
+    "message": "额外挂上会话索引 `authuser`"
+  },
+  "authuserHint": {
+    "message": "仅在只挂 `login_hint` 选不中账号时才需要。取值是 Gmail 地址栏 `/mail/u/N/` 里的那个 N。注意它会随登录顺序变化。"
+  },
+  "tabSso": {
+    "message": "企业 SSO"
+  },
+  "tabAccounts": {
+    "message": "账号绑定"
+  },
+  "tabBackup": {
+    "message": "备份"
+  },
+  "tabDiag": {
+    "message": "诊断"
+  },
+  "accountsIntro": {
+    "message": "让指定域名固定用某个 Google 账号打开——比如 Meet、日历、文档走工作账号，其余网站保持个人账号。这里挂的是 `authuser`，和「企业 SSO」是两套独立规则，*只用其中一个也可以*。"
+  },
+  "accountsEmpty": {
+    "message": "还没有绑定。点下面的按钮加一组。"
+  },
+  "addGroupButton": {
+    "message": "添加一组"
+  },
+  "groupIndex": {
+    "message": "第 $number$ 组",
+    "placeholders": {
+      "number": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "removeGroupButton": {
+    "message": "删除"
+  },
+  "groupEmailLabel": {
+    "message": "Google 账号"
+  },
+  "groupDomainsLabel": {
+    "message": "应用到这些域名"
+  },
+  "saveButton": {
+    "message": "保存并授权"
+  },
+  "backupHint": {
+    "message": "导出成 JSON 文件存起来，重装扩展或换机器后导入即可，不用重填。文件里含你的企业邮箱和域名列表，别随手外发。"
+  },
+  "exportButton": {
+    "message": "导出配置"
+  },
+  "importButton": {
+    "message": "导入配置"
+  },
+  "activeRulesTitle": {
+    "message": "当前生效的规则"
+  },
+  "diagnosticsHint": {
+    "message": "登录后规则似乎没起作用时，用这个查看最近 5 分钟内的命中记录。需要额外授权一项权限——它只用于读取本扩展自己的规则命中记录，不会上传任何数据，随时可以在扩展详情页撤销。"
+  },
+  "checkMatchesButton": {
+    "message": "查看最近命中的规则"
+  },
+  "statusIncomplete": {
+    "message": "还没有任何配置——填企业 SSO，或者加一组账号绑定"
+  },
+  "statusSsoPartial": {
+    "message": "企业 SSO 的邮箱和域名要一起填，只填一个不会生成规则"
+  },
+  "statusPermissionFailed": {
+    "message": "权限申请失败：$reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "User gesture required"
+      }
+    }
+  },
+  "statusNotGranted": {
+    "message": "没有授权这些域名，规则无法生效"
+  },
+  "statusSaved": {
+    "message": "已保存，锁定到 $email$",
+    "placeholders": {
+      "email": {
+        "content": "$1",
+        "example": "you@your-company.com"
+      }
+    }
+  },
+  "statusSavedAccountsOnly": {
+    "message": "已保存 $count$ 组账号绑定",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "rulesCount": {
+    "message": "共 $count$ 条",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "diagNotGranted": {
+    "message": "未授权，无法读取命中记录"
+  },
+  "diagNoMatches": {
+    "message": "最近 5 分钟内没有命中记录——先走一次登录再回来看"
+  },
+  "diagCount": {
+    "message": "共 $count$ 条",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "matchedRuleLine": {
+    "message": "$time$  命中规则 $id$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "10:24:31"
+      },
+      "id": {
+        "content": "$2",
+        "example": "5"
+      }
+    }
+  },
+  "backupIncomplete": {
+    "message": "还没有可导出的配置"
+  },
+  "backupExported": {
+    "message": "已导出 $filename$",
+    "placeholders": {
+      "filename": {
+        "content": "$1",
+        "example": "sso-account-pin-config.json"
+      }
+    }
+  },
+  "backupImported": {
+    "message": "已载入，点「保存并授权」生效"
+  },
+  "backupImportFailed": {
+    "message": "导入失败：$reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "不是合法的 JSON"
+      }
+    }
+  },
+  "importErrNotJson": {
+    "message": "不是合法的 JSON"
+  },
+  "importErrNotObject": {
+    "message": "文件内容不是配置对象"
+  },
+  "importErrWrongFormat": {
+    "message": "不是本扩展导出的配置文件"
+  },
+  "importErrMissingFields": {
+    "message": "文件里缺邮箱或企业域名"
+  }
+}

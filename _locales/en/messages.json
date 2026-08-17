@@ -1,0 +1,212 @@
+{
+  "extName": {
+    "message": "SSO Account Pin",
+    "description": "Extension name shown in the toolbar and chrome://extensions"
+  },
+  "extDescription": {
+    "message": "Pin enterprise SSO sign-in to a specific Google account, skipping the account chooser when several accounts are signed in.",
+    "description": "Extension description shown in chrome://extensions"
+  },
+  "actionTitle": {
+    "message": "SSO Account Pin — Settings",
+    "description": "Tooltip on the toolbar icon"
+  },
+  "optionsTitle": {
+    "message": "SSO Account Pin — Settings",
+    "description": "Title of the options page"
+  },
+  "appTitle": {
+    "message": "SSO Account Pin",
+    "description": "Main heading of the options page"
+  },
+  "lede": {
+    "message": "During enterprise SSO, point the authorization request at a specific Google account so you skip the “choose an account” and “enter your email” steps."
+  },
+  "emailLabel": {
+    "message": "Work Google account"
+  },
+  "emailHint": {
+    "message": "The account to pin on sign-in. It is sent as `login_hint` on the authorization request."
+  },
+  "domainsLabel": {
+    "message": "Company domains"
+  },
+  "domainsHint": {
+    "message": "One per line; commas or spaces also work. Used to recognize your company's sign-in flow — *only requests whose URL contains one of these domains are modified*, so signing in with a personal account elsewhere is unaffected."
+  },
+  "authuserCheckbox": {
+    "message": "Also send the session index `authuser`"
+  },
+  "authuserHint": {
+    "message": "Only needed when `login_hint` alone does not select the account. The value is the N in the Gmail address bar path `/mail/u/N/`. Note that it changes with sign-in order."
+  },
+  "tabSso": {
+    "message": "Enterprise SSO"
+  },
+  "tabAccounts": {
+    "message": "Account binding"
+  },
+  "tabBackup": {
+    "message": "Backup"
+  },
+  "tabDiag": {
+    "message": "Diagnostics"
+  },
+  "accountsIntro": {
+    "message": "Always open certain sites with a specific Google account — Meet, Calendar and Docs on your work account, for example, while everything else stays on your personal one. This adds `authuser` and is independent of Enterprise SSO above; *either one works on its own*."
+  },
+  "accountsEmpty": {
+    "message": "No bindings yet. Use the button below to add one."
+  },
+  "addGroupButton": {
+    "message": "Add a binding"
+  },
+  "groupIndex": {
+    "message": "Binding $number$",
+    "placeholders": {
+      "number": {
+        "content": "$1",
+        "example": "1"
+      }
+    }
+  },
+  "removeGroupButton": {
+    "message": "Remove"
+  },
+  "groupEmailLabel": {
+    "message": "Google account"
+  },
+  "groupDomainsLabel": {
+    "message": "Apply to these domains"
+  },
+  "saveButton": {
+    "message": "Save and grant access"
+  },
+  "backupHint": {
+    "message": "Export your settings to a JSON file so you can import them again after reinstalling or switching machines. The file contains your work email and domain list — do not share it casually."
+  },
+  "exportButton": {
+    "message": "Export settings"
+  },
+  "importButton": {
+    "message": "Import settings"
+  },
+  "activeRulesTitle": {
+    "message": "Rules currently in effect"
+  },
+  "diagnosticsHint": {
+    "message": "If sign-in does not seem to be using your rules, check which of them matched in the last 5 minutes. This needs one extra permission, used only to read this extension's own rule matches. Nothing is uploaded, and you can revoke it at any time from the extension's details page."
+  },
+  "checkMatchesButton": {
+    "message": "Show recent rule matches"
+  },
+  "statusIncomplete": {
+    "message": "Nothing configured yet — set up Enterprise SSO, or add an account binding"
+  },
+  "statusSsoPartial": {
+    "message": "Enterprise SSO needs both an email address and at least one domain; filling in only one produces no rules"
+  },
+  "statusPermissionFailed": {
+    "message": "Permission request failed: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "User gesture required"
+      }
+    }
+  },
+  "statusNotGranted": {
+    "message": "Access to those domains was not granted, so the rules cannot take effect"
+  },
+  "statusSaved": {
+    "message": "Saved, pinned to $email$",
+    "placeholders": {
+      "email": {
+        "content": "$1",
+        "example": "you@your-company.com"
+      }
+    }
+  },
+  "statusSavedAccountsOnly": {
+    "message": "Saved. Account bindings: $count$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "rulesCount": {
+    "message": "Rules in effect: $count$",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "12"
+      }
+    }
+  },
+  "diagNotGranted": {
+    "message": "Not granted, so rule matches cannot be read"
+  },
+  "diagNoMatches": {
+    "message": "No matches in the last 5 minutes — sign in once, then come back"
+  },
+  "diagCount": {
+    "message": "$count$ matches",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
+  "matchedRuleLine": {
+    "message": "$time$  matched rule $id$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "10:24:31"
+      },
+      "id": {
+        "content": "$2",
+        "example": "5"
+      }
+    }
+  },
+  "backupIncomplete": {
+    "message": "Nothing to export yet"
+  },
+  "backupExported": {
+    "message": "Exported $filename$",
+    "placeholders": {
+      "filename": {
+        "content": "$1",
+        "example": "sso-account-pin-config.json"
+      }
+    }
+  },
+  "backupImported": {
+    "message": "Loaded — click “Save and grant access” to apply"
+  },
+  "backupImportFailed": {
+    "message": "Import failed: $reason$",
+    "placeholders": {
+      "reason": {
+        "content": "$1",
+        "example": "Not valid JSON"
+      }
+    }
+  },
+  "importErrNotJson": {
+    "message": "Not valid JSON"
+  },
+  "importErrNotObject": {
+    "message": "File content is not a settings object"
+  },
+  "importErrWrongFormat": {
+    "message": "Not a settings file exported by this extension"
+  },
+  "importErrMissingFields": {
+    "message": "The file is missing the email address or company domains"
+  }
+}

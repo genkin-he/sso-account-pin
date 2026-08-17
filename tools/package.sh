@@ -18,7 +18,8 @@ zip -r -q "$OUT" \
   options.html \
   options.css \
   options.js \
-  icons
+  icons \
+  _locales
 
 # 变量名要用 ${} 括起来：紧跟中文全角字符时，bash 会把它当成变量名的一部分
 echo "已生成 ${OUT}（$(du -h "${OUT}" | cut -f1)）"

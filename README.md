@@ -98,7 +98,8 @@ host 权限，而权限申请必须由点击直接触发。
 权限警告，是审核的重点关注项。
 
 规则写入失败（比如域名含特殊字符导致正则非法）会在 Service Worker 控制台里以
-`规则写入失败` 报出来。打开方式：`chrome://extensions/` → 本扩展 →「Service Worker」。
+`failed to write rules` 报出来。打开方式：`chrome://extensions/` → 本扩展 →
+「Service Worker」。控制台日志统一用英文，界面文案才走 i18n。
 
 ## 发布到 Chrome Web Store
 
@@ -117,9 +118,14 @@ host 权限，而权限申请必须由点击直接触发。
 | 文件 | 作用 |
 |---|---|
 | `manifest.json` | MV3 清单。静态权限只有 `accounts.google.com` |
-| `settings.js` | 设置读写与域名清洗，后台和设置页共用 |
+| `_locales/` | 界面文案，中英双语。Chrome 按用户语言自动选，默认 `en` |
+| `settings.js` | 设置读写、域名清洗、备份文件解析，后台和设置页共用 |
 | `background.js` | 按配置生成动态规则 |
-| `options.html/css/js` | 设置页与诊断 |
+| `options.html/css/js` | 设置页、备份与诊断 |
 | `icons/` | 图标，由 `tools/make-icons.py` 生成 |
 | `tools/make-icons.py` | 纯标准库手写 PNG 编码，不依赖 PIL |
 | `tools/package.sh` | 生成上传用 zip |
+
+## 许可
+
+[MIT](LICENSE)

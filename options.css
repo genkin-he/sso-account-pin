@@ -1,206 +1,526 @@
+/* 结构取自 creatorhub：分层表面、1px 描边、柔和投影、胶囊标签页。
+   配色改成蓝白，主色对齐扩展图标的 #1a73e8（Google 蓝）。
+   字体只声明不加载——MV3 扩展页的 CSP 禁止远程资源，装了 Fira 就用，
+   没装回退到系统字体。 */
+
 :root {
-  --bg: #f6f7f9;
+  /* 表面。从页面底色到抬起层依次变亮，输入框反过来用底色做下沉感 */
+  --bg: #f4f7fc;
   --surface: #ffffff;
-  --text: #1f2937;
-  --muted: #6b7280;
-  --border: #e3e6ea;
-  --accent: #1a73e8;
-  --ok: #128a4b;
-  --err: #c5221f;
-  --radius: 10px;
+  --surface-2: #f1f5fb;
+  --surface-3: #e6ecf6;
+  --line: #d6deeb;
+  --line-soft: #e8edf6;
+
+  /* 文字。带一点蓝调，和纯灰拉开 */
+  --fg: #1f2733;
+  --fg-strong: #0f1620;
+  --mut: #5c6879;
+  --mut-2: #8b96a8;
+
+  /* 品牌色，取自 icons/*.png。想换主色改这一组就够 */
+  --acc: #1a73e8;
+  --acc-hover: #3b8bf5;
+  --acc-soft: rgba(26, 115, 232, 0.1);
+  --acc-ring: rgba(26, 115, 232, 0.28);
+
+  /* 语义色。浅底上要压深才够对比度，不能直接搬深色主题那套亮色 */
+  --success: #0b7a43;
+  --success-soft: rgba(11, 122, 67, 0.1);
+  --danger: #c5221f;
+  --danger-soft: rgba(197, 34, 31, 0.09);
+
+  /* 形状。浅底上的投影要比深底克制得多，重了就脏 */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r: 12px;
+  --r-lg: 16px;
+  --sh-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --sh: 0 1px 3px rgba(16, 24, 40, 0.08), 0 14px 30px -18px rgba(16, 24, 40, 0.22);
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --sans: "Fira Sans", system-ui, -apple-system, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  --mono: "Fira Code", ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo,
+    Consolas, monospace;
 }
 
 * {
   box-sizing: border-box;
 }
 
+/* 下面给不少元素设了 display，不兜住的话 hidden 属性会失效 */
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
-  padding: 40px 20px;
-  background: var(--bg);
-  color: var(--text);
-  font: 14px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Microsoft YaHei", sans-serif;
+  padding: 40px 20px 64px;
+  min-height: 100vh;
+  font: 14px/1.6 var(--sans);
+  color: var(--fg);
+  background: radial-gradient(
+      900px 420px at 85% -12%,
+      rgba(26, 115, 232, 0.09),
+      transparent 60%
+    ),
+    radial-gradient(700px 380px at 0% 0%, rgba(26, 115, 232, 0.05), transparent 55%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--acc-soft);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-clip: padding-box;
 }
 
 main {
-  max-width: 620px;
+  display: grid;
+  gap: 18px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
+/* 正文段落单独收窄。容器宽了之后，说明文字要是也铺满，一行七八十字
+   读起来很累——输入框该变宽，段落不该。 */
+.hint,
+.lede {
+  max-width: 74ch;
+}
+
+/* ── 页头 ─────────────────────────────────────────────────────────────── */
+
 header {
-  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--acc-hover), var(--acc));
+  color: #fff;
+  box-shadow: 0 6px 18px -6px var(--acc-ring);
+}
+
+.brand-mark svg {
+  width: 20px;
+  height: 20px;
 }
 
 h1 {
-  margin: 0 0 6px;
-  font-size: 22px;
-  font-weight: 600;
+  margin: 0 0 2px;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  color: var(--fg-strong);
 }
 
 .lede {
   margin: 0;
-  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--mut);
 }
 
-form,
-#backup,
-#active-rules {
-  padding: 24px;
+/* ── 卡片 ─────────────────────────────────────────────────────────────── */
+
+.card {
+  padding: 20px;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 
-#backup,
-#active-rules {
-  margin-top: 20px;
+.card:hover {
+  border-color: color-mix(in srgb, var(--line) 55%, var(--acc));
+  box-shadow: var(--sh);
 }
 
 h2 {
   margin: 0 0 12px;
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 600;
+  color: var(--fg-strong);
 }
 
-section + section {
-  margin-top: 22px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
+/* ── 标签页 ───────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  width: max-content;
+  max-width: 100%;
+  padding: 5px;
+  /* 浅底上分段控件要反着来：容器压暗一档，选中项用纯白抬起。
+     深色主题那套「选中项更亮」在白底上会变成一块脏灰。 */
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow-x: auto;
+}
+
+[role="tab"] {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 8px 15px;
+  color: var(--mut);
+  font-size: 13px;
+  font-weight: 550;
+  white-space: nowrap;
+  box-shadow: none;
+  transition: color 0.18s var(--ease), background 0.18s var(--ease),
+    border-color 0.18s var(--ease);
+}
+
+[role="tab"]:hover {
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--fg);
+  filter: none;
+}
+
+[role="tab"][aria-selected="true"] {
+  background: var(--surface);
+  border-color: var(--line);
+  box-shadow: var(--sh-sm);
+  color: var(--acc);
+}
+
+.panel {
+  display: grid;
+  gap: 20px;
+}
+
+/* ── 表单 ─────────────────────────────────────────────────────────────── */
+
+.panel > section + section {
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* SSO 面板是一列窄表单，不跟着容器铺满——一个邮箱、几个域名撑不起 900px。
+   账号绑定和诊断面板不设限：前者要排两列，后者的规则正则很长。 */
+#panel-sso {
+  max-width: 600px;
 }
 
 label {
   display: block;
-  margin-bottom: 6px;
-  font-weight: 500;
+  margin-bottom: 7px;
+  font-size: 12.5px;
+  font-weight: 550;
+  color: var(--fg);
 }
 
-input[type="email"],
-input[type="text"],
+input,
 textarea {
   width: 100%;
-  padding: 9px 11px;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  font: inherit;
-  color: inherit;
-  background: var(--surface);
-}
-
-input[type="text"] {
-  width: auto;
-  min-width: 70px;
-}
-
-textarea {
-  resize: vertical;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--fg);
+  font-family: inherit;
   font-size: 13px;
+  transition: border-color 0.18s var(--ease);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--mut-2);
+}
+
+input:hover,
+textarea:hover {
+  border-color: #b9c5d8;
 }
 
 input:focus,
 textarea:focus {
-  outline: 2px solid var(--accent);
-  outline-offset: -1px;
-  border-color: transparent;
+  outline: none;
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-ring);
+}
+
+input:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 62px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--acc);
 }
 
 .checkbox {
   display: flex;
-  gap: 8px;
   align-items: center;
-  margin-bottom: 8px;
-  font-weight: 500;
+  gap: 9px;
+  margin: 0;
 }
 
-.checkbox input {
-  width: 16px;
-  height: 16px;
-  margin: 0;
+/* authuser 那一行：勾选框和输入框同排，说明文字换行占满 */
+section.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+section.row #authuser {
+  flex: 0 0 auto;
+  width: 76px;
+  text-align: center;
+}
+
+/* 必须解掉 .hint 的 74ch 上限：留着的话这行放得下，就不会换行，
+   说明文字会挤到勾选框右边去 */
+section.row .hint {
+  flex-basis: 100%;
+  max-width: none;
+  margin-top: 0;
 }
 
 .hint {
   margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--mut);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.hint strong {
+  color: var(--fg);
+  font-weight: 600;
 }
 
 code {
-  padding: 1px 5px;
-  background: var(--bg);
-  border-radius: 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
+  padding: 1.5px 5px;
+  background: var(--surface-3);
+  border-radius: var(--r-xs);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 11.5px;
 }
 
-footer {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-top: 26px;
-  padding-top: 22px;
-  border-top: 1px solid var(--border);
+/* ── 账号绑定组 ───────────────────────────────────────────────────────── */
+
+/* 宽度够就两列并排，窄了自动落回一列——绑定组多起来时不用一直往下滚 */
+#account-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
 }
+
+.group {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  background: var(--surface-2);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r);
+}
+
+/* 绑定组自身是浅蓝底，输入框得回到纯白才分得清层次——
+   沿用全局的 --bg 会和组底色撞在一起，只剩一圈描边 */
+.group input,
+.group textarea {
+  background: var(--surface);
+}
+
+.group-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 不用等宽 + 字距：英文下好看，中文下「第 1 组」会散架 */
+.group-index {
+  color: var(--mut);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.group-head .remove-group {
+  margin-left: auto;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--mut);
+}
+
+.empty-note {
+  padding: 22px 16px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  text-align: center;
+}
+
+/* ── 按钮 ─────────────────────────────────────────────────────────────── */
 
 button {
-  padding: 9px 18px;
-  border: 0;
-  border-radius: 7px;
-  background: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: linear-gradient(180deg, var(--acc-hover), var(--acc));
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  box-shadow: 0 6px 16px -11px var(--acc-ring), inset 0 1px 0 rgba(255, 255, 255, 0.13);
   color: #fff;
   font: inherit;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1;
   cursor: pointer;
+  transition: filter 0.18s var(--ease), background 0.18s var(--ease),
+    border-color 0.18s var(--ease), transform 0.06s var(--ease);
 }
 
 button:hover {
-  background: #1765cc;
+  filter: brightness(1.07);
 }
 
-button:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
+button:active {
+  transform: translateY(1px);
 }
 
-/* 备份是辅助操作，别和「保存并授权」抢视线 */
-button.secondary {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
+button.ghost {
+  background: var(--surface-2);
+  border-color: var(--line);
+  box-shadow: none;
+  color: var(--fg);
 }
 
-button.secondary:hover {
-  background: var(--bg);
+button.ghost:hover {
+  background: var(--surface-3);
+  border-color: #b9c5d8;
+  filter: none;
+}
+
+.remove-group {
+  padding: 5px 11px;
+  font-size: 12px;
+  border-radius: var(--r-xs);
+}
+
+.remove-group:hover {
+  background: var(--danger-soft);
+  border-color: color-mix(in srgb, var(--danger) 34%, var(--line));
+  color: var(--danger);
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--acc-ring);
 }
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   align-items: center;
   margin: 14px 0 0;
 }
 
+footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+}
+
+/* ── 状态提示 ─────────────────────────────────────────────────────────── */
+
 #status,
 #diag-status,
 #backup-status {
-  font-size: 13px;
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 
 .ok {
-  color: var(--ok);
+  color: var(--success);
 }
 
 .err {
-  color: var(--err);
+  color: var(--danger);
 }
+
+/* ── 规则输出 ─────────────────────────────────────────────────────────── */
 
 pre {
   margin: 0;
   padding: 14px;
-  overflow-x: auto;
+  max-height: 320px;
+  overflow: auto;
   background: var(--bg);
-  border-radius: 7px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  line-height: 1.5;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--r-sm);
+  /* 规则本身是要读的内容，11.5px 等宽再用弱化色就不够对比度了 */
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+
+#matched-dump {
+  margin-top: 12px;
+}
+
+/* 诊断面板里「当前生效的规则」是子块，不是独立卡片 */
+#active-rules h2 {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 560px) {
+  body {
+    padding: 24px 14px 48px;
+  }
+  .card {
+    padding: 16px;
+  }
 }
