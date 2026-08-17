@@ -245,7 +245,7 @@ This pattern is declared under "optional_host_permissions", never under "host_pe
 
 # 五、提交流程
 
-1. `./tools/package.sh` → 得到 `dist/sso-account-pin-1.0.0.zip`
+1. `./tools/package.sh` → 得到 `dist/sso-account-pin-<版本号>.zip`（文件名取自 manifest）
 2. 后台 → **Add new item** → 上传 zip
 3. 填 **Store listing**（第一节），保存
 4. 语言下拉切到 **中文（简体）**，填第二节，保存
@@ -253,8 +253,21 @@ This pattern is declared under "optional_host_permissions", never under "host_pe
 6. **Distribution**：Visibility = **Public**，地区全选，免费
 7. 右上角 **Submit for review**
 
-首次提交通常几个工作日，赶上人工复审可能一两周。之后每次更新都要**递增
-`manifest.json` 的 `version`**，商店不接受重复版本号。
+首次提交通常几个工作日，赶上人工复审可能一两周。
+
+## 后续更新
+
+已上架之后走的是另一条路径，不要再用 Add new item：
+
+1. **先递增 `manifest.json` 的 `version`**——商店不接受重复版本号，忘了这步
+   上传会直接被拒
+2. `./tools/package.sh` 重新打包
+3. 后台选中已有条目 → **Package → Upload new package** → 上传新 zip
+4. 商店信息有变才需要改，没变直接 **Submit for review**
+
+更新版本的审核通常比首发快。审核期间线上仍是旧版本，不影响已安装的用户。
+权限有增加时（新增 permissions 或扩大 host 权限）会触发更严格的复审，
+并且用户那边扩展会被停用直到手动确认新权限——这一版没有新增权限。
 
 ---
 
